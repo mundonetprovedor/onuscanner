@@ -40,11 +40,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleQuickLogin = (u: string, p: string) => {
-    setUsername(u);
-    setPassword(p);
-  };
-
   return (
     <div style={{
       minHeight: '100vh',
@@ -54,7 +49,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       backgroundColor: 'var(--color-canvas)',
       padding: '20px',
     }}>
-      <div className="b2b-card" style={{ width: '100%', maxWidth: '420px', padding: '32px 28px' }}>
+      <div className="b2b-card" style={{ width: '100%', maxWidth: '400px', padding: '36px 28px' }}>
         
         {/* Header Branding */}
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
@@ -156,22 +151,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             )}
           </button>
         </form>
-
-        {/* Quick Credentials Info Box */}
-        <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--color-border)', fontSize: '12px', color: 'var(--color-text-muted)' }}>
-          <div style={{ fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-            Credenciais Padrão do Sistema:
-          </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('root_mn', 'R0t3@d0r')}
-              style={{ background: '#0b1120', border: '1px solid var(--color-border)', padding: '4px 8px', borderRadius: '4px', color: '#60a5fa', cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
-            >
-              root_mn / R0t3@d0r
-            </button>
-          </div>
-        </div>
 
       </div>
     </div>
