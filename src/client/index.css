@@ -1,0 +1,248 @@
+/* ==========================================================================
+   MUNDONET ONT SCANNER - CORPORATE B2B DESIGN SYSTEM
+   Palette: Slate, Graphite, Corporate Blue (Navy), Neutral Accents
+   ========================================================================== */
+
+:root {
+  /* Surface & Canvas Colors */
+  --color-canvas: #0f172a;          /* Slate 900 */
+  --color-surface: #1e293b;         /* Slate 800 */
+  --color-surface-hover: #334155;   /* Slate 700 */
+  --color-border: #334155;          /* Slate 700 */
+  --color-border-subtle: #1e293b;
+
+  /* Corporate Accents */
+  --color-brand-primary: #2563eb;   /* Corporate Blue 600 */
+  --color-brand-hover: #1d4ed8;     /* Corporate Blue 700 */
+  --color-brand-subtle: rgba(37, 99, 235, 0.12);
+
+  /* Status Tokens */
+  --color-status-success: #059669; /* Emerald 600 */
+  --color-status-success-bg: rgba(5, 150, 105, 0.15);
+
+  --color-status-warning: #d97706; /* Amber 600 */
+  --color-status-warning-bg: rgba(217, 119, 6, 0.15);
+
+  --color-status-danger: #dc2626;  /* Red 600 */
+  --color-status-danger-bg: rgba(220, 38, 38, 0.15);
+
+  /* Typography Colors */
+  --color-text-primary: #f8fafc;   /* Slate 50 */
+  --color-text-secondary: #94a3b8; /* Slate 400 */
+  --color-text-muted: #64748b;     /* Slate 500 */
+
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  /* Structure */
+  --radius-xl: 12px;
+  --radius-lg: 8px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout Container */
+.b2b-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Clean Corporate Card */
+.b2b-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Form Controls */
+.b2b-input,
+.b2b-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  background-color: #0b1120;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.b2b-input:focus,
+.b2b-select:focus {
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* Buttons */
+.b2b-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.b2b-btn-primary {
+  background-color: var(--color-brand-primary);
+  color: #ffffff;
+}
+
+.b2b-btn-primary:hover {
+  background-color: var(--color-brand-hover);
+}
+
+.b2b-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.b2b-btn-secondary:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.b2b-btn-danger {
+  background-color: var(--color-status-danger);
+  color: #ffffff;
+}
+
+.b2b-btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+.b2b-btn-sm {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+}
+
+/* Hero GPON Banner (Foco 1 do Usuário) */
+.gpon-hero-banner {
+  background: linear-gradient(135deg, #0b1120 0%, #1e293b 100%);
+  border: 2px solid var(--color-brand-primary);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+}
+
+.gpon-hero-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.gpon-hero-code {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #60a5fa;
+  letter-spacing: -0.02em;
+}
+
+/* Featured Action Card (Foco 2 do Usuário - Desautorizar ONU) */
+.featured-action-card {
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+/* Badges */
+.b2b-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.b2b-badge-online {
+  background-color: var(--color-status-success-bg);
+  color: #34d399;
+}
+
+.b2b-badge-offline {
+  background-color: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+/* Code Snippet Box */
+.b2b-code-block {
+  background-color: #070b14;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #34d399;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 768px) {
+  .b2b-card {
+    padding: 16px;
+  }
+
+  .gpon-hero-code {
+    font-size: 1.6rem;
+  }
+
+  .b2b-btn {
+    width: 100%;
+  }
+
+  .mobile-column {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+}
