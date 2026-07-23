@@ -6,9 +6,14 @@ import { OntDetailsCard } from './components/OntDetailsCard';
 import { CommandPalette } from './components/CommandPalette';
 import { OltManagerModal } from './components/OltManagerModal';
 import { TerminalModal } from './components/TerminalModal';
+import { LoginScreen } from './components/LoginScreen';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem('ont_scanner_token'));
+  const [user, setUser] = useState<{ username: string; name: string; role: string } | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+
   const [olts, setOlts] = useState<OLTConfig[]>([]);
   const [selectedOltId, setSelectedOltId] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -18,9 +23,39 @@ export const App: React.FC = () => {
   const [showOltModal, setShowOltModal] = useState<boolean>(false);
   const [terminalOutput, setTerminalOutput] = useState<{ title: string; output: string } | null>(null);
 
+  // Check Token Validity on Mount
+  useEffect(() => {
+    const token = localStorage.getItem('ont_scanner_token');
+    if (!token) {
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.user) {
+          setAuthToken(token);
+          setUser(data.user);
+        } else {
+          handleLogout();
+        }
+      })
+      .catch(() => handleLogout())
+      .finally(() => setIsCheckingAuth(false));
+  }, []);
+
+  // Fetch OLTs after login
   const fetchOlts = async () => {
+    if (!authToken) return;
     try {
-      const res = await fetch('/api/olts');
+      const res = await fetch('/api/olts', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      if (res.status === 401) return handleLogout();
+
       const data = await res.json();
       if (data.success) {
         setOlts(data.data);
@@ -31,10 +66,34 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchOlts();
-  }, []);
+    if (authToken) {
+      fetchOlts();
+    }
+  }, [authToken]);
+
+  const handleLoginSuccess = (token: string, userData: { username: string; name: string; role: string }) => {
+    localStorage.setItem('ont_scanner_token', token);
+    setAuthToken(token);
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    if (authToken) {
+      fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${authToken}` },
+      }).catch(() => {});
+    }
+
+    localStorage.removeItem('ont_scanner_token');
+    setAuthToken(null);
+    setUser(null);
+    setScanResult(null);
+  };
 
   const handleScan = async (snOrMac: string) => {
+    if (!authToken) return;
+
     setIsLoading(true);
     setErrorMessage(null);
     setScanResult(null);
@@ -42,13 +101,18 @@ export const App: React.FC = () => {
     try {
       const res = await fetch('/api/scan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
         body: JSON.stringify({
           snOrMac,
           oltId: selectedOltId || undefined,
           useMockIfOffline: true,
         }),
       });
+
+      if (res.status === 401) return handleLogout();
 
       const data: ScanResult = await res.json();
 
@@ -65,7 +129,7 @@ export const App: React.FC = () => {
   };
 
   const handleExecuteCommand = async (cmd: CommandTemplate) => {
-    if (!scanResult?.data) return;
+    if (!scanResult?.data || !authToken) return;
 
     const confirmExec = window.confirm(
       `Confirma a execução de "${cmd.title}" na OLT ${scanResult.data.oltName}?`
@@ -76,13 +140,18 @@ export const App: React.FC = () => {
     try {
       const res = await fetch('/api/execute', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
         body: JSON.stringify({
           oltIp: scanResult.data.oltIp,
           cliCommand: cmd.cliCommand,
           vendor: scanResult.data.vendor,
         }),
       });
+
+      if (res.status === 401) return handleLogout();
 
       const data = await res.json();
       setTerminalOutput({
@@ -98,12 +167,18 @@ export const App: React.FC = () => {
   };
 
   const handleAddOlt = async (newOlt: Omit<OLTConfig, 'id'>) => {
+    if (!authToken) return;
     try {
-      await fetch('/api/olts', {
+      const res = await fetch('/api/olts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
         body: JSON.stringify(newOlt),
       });
+
+      if (res.status === 401) return handleLogout();
       fetchOlts();
     } catch (err) {
       console.error(err);
@@ -111,19 +186,42 @@ export const App: React.FC = () => {
   };
 
   const handleDeleteOlt = async (id: string) => {
+    if (!authToken) return;
     try {
-      await fetch(`/api/olts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/olts/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      if (res.status === 401) return handleLogout();
       fetchOlts();
     } catch (err) {
       console.error(err);
     }
   };
 
-  return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
-      <Header oltsCount={olts.length} onOpenOltManager={() => setShowOltModal(true)} />
+  if (isCheckingAuth) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-canvas)', color: 'var(--color-text-secondary)' }}>
+        Verificando sessão...
+      </div>
+    );
+  }
 
-      <main className="container" style={{ flex: 1, paddingBottom: '40px' }}>
+  if (!authToken || !user) {
+    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-canvas)' }}>
+      <Header
+        oltsCount={olts.length}
+        user={user}
+        onOpenOltManager={() => setShowOltModal(true)}
+        onLogout={handleLogout}
+      />
+
+      <main className="b2b-container" style={{ flex: 1, paddingBottom: '40px' }}>
         <SearchHero
           olts={olts}
           selectedOltId={selectedOltId}
@@ -134,16 +232,16 @@ export const App: React.FC = () => {
 
         {errorMessage && (
           <div
-            className="card"
+            className="b2b-card"
             style={{
               borderColor: 'rgba(239, 68, 68, 0.3)',
-              background: 'rgba(239, 68, 68, 0.08)',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
               marginTop: '16px',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
               color: '#f87171',
-              fontSize: '0.9rem',
+              fontSize: '13px',
             }}
           >
             <AlertCircle size={18} />
@@ -153,11 +251,11 @@ export const App: React.FC = () => {
 
         {scanResult?.data && (
           <>
-            <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               <span>
                 Varredura em <strong>{scanResult.executionTimeMs}ms</strong>
               </span>
-              <span style={{ color: 'var(--status-green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <CheckCircle2 size={13} /> Localizada na OLT
               </span>
             </div>
@@ -183,8 +281,8 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      <footer style={{ borderTop: '1px solid var(--bg-surface-border)', padding: '16px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-        MUNDONET Telecom • ONT Scanner Web & Mobile
+      <footer style={{ borderTop: '1px solid var(--color-border)', padding: '16px 0', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '12px' }}>
+        MUNDONET Telecom • ONT Scanner Enterprise
       </footer>
 
       {showOltModal && (
