@@ -58,6 +58,36 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite !important;
+}
+
+@keyframes pulse-shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-shimmer {
+  animation: pulse-shimmer 1.5s ease-in-out infinite;
+}
+
 /* Layout Container */
 .b2b-container {
   width: 100%;
@@ -149,7 +179,7 @@ body {
   border-radius: var(--radius-sm);
 }
 
-/* Hero GPON Banner (Foco 1 do Usuário) */
+/* Hero GPON Banner */
 .gpon-hero-banner {
   background: linear-gradient(135deg, #0b1120 0%, #1e293b 100%);
   border: 2px solid var(--color-brand-primary);
@@ -179,7 +209,7 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* Featured Action Card (Foco 2 do Usuário - Desautorizar ONU) */
+/* Featured Action Card */
 .featured-action-card {
   background: rgba(220, 38, 38, 0.06);
   border: 1px solid rgba(220, 38, 38, 0.3);

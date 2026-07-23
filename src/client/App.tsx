@@ -18,7 +18,6 @@ export const App: React.FC = () => {
   const [olts, setOlts] = useState<OLTConfig[]>([]);
   const [selectedOltId, setSelectedOltId] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [scanStep, setScanStep] = useState<number>(0);
   const [searchingSn, setSearchingSn] = useState<string>('');
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -96,15 +95,9 @@ export const App: React.FC = () => {
     if (!authToken) return;
 
     setIsLoading(true);
-    setScanStep(0);
     setSearchingSn(snOrMac);
     setErrorMessage(null);
     setScanResult(null);
-
-    // Simulate real-time progress steps during network SSH query
-    const stepInterval = setInterval(() => {
-      setScanStep((prev) => (prev < 3 ? prev + 1 : prev));
-    }, 600);
 
     try {
       const res = await fetch('/api/scan', {
@@ -120,20 +113,16 @@ export const App: React.FC = () => {
         }),
       });
 
-      clearInterval(stepInterval);
-
       if (res.status === 401) return handleLogout();
 
       const data: ScanResult = await res.json();
 
       if (data.success && data.data) {
-        setScanStep(3);
         setScanResult(data);
       } else {
         setErrorMessage(data.message || 'Nenhuma ONT localizada com este código.');
       }
     } catch (err: any) {
-      clearInterval(stepInterval);
       setErrorMessage('Erro de conexão com o servidor backend.');
     } finally {
       setIsLoading(false);
@@ -248,7 +237,6 @@ export const App: React.FC = () => {
         {isLoading && (
           <ScanProgressModal
             sn={searchingSn}
-            step={scanStep}
             currentOltName={selectedOltObj ? selectedOltObj.name : 'Todas as OLTs Huawei'}
           />
         )}
