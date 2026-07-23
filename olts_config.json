@@ -34,39 +34,5 @@
     "protocol": "SSH",
     "isMock": false,
     "isDefault": true
-  },
-  {
-    "id": "olt-huawei-demo",
-    "name": "OLT Huawei MA5800 - POP Central",
-    "vendor": "HUAWEI",
-    "ip": "192.168.10.10",
-    "port": 22,
-    "username": "admin",
-    "password": "admin_password",
-    "enablePassword": "admin_enable",
-    "protocol": "SSH",
-    "isMock": true
-  },
-  {
-    "id": "olt-fiberhome-demo",
-    "name": "OLT Fiberhome AN6000-7 - POP Z. Norte",
-    "vendor": "FIBERHOME_AN6000",
-    "ip": "192.168.20.10",
-    "port": 22,
-    "username": "admin",
-    "password": "admin_password",
-    "protocol": "SSH",
-    "isMock": true
-  },
-  {
-    "name": "OLT VILA EMBRATEL",
-    "vendor": "HUAWEI",
-    "ip": "172.16.1.22",
-    "port": 22,
-    "username": "ixcixc",
-    "password": "1Mr0xn0w!",
-    "protocol": "SSH",
-    "isMock": false,
-    "id": "olt-1784832482371"
   }
 ]

@@ -40,7 +40,7 @@ export const SearchHero: React.FC<SearchHeroProps> = ({
               <input
                 type="text"
                 className="b2b-input"
-                placeholder="Insira o Serial Number (SN / MAC) da ONT..."
+                placeholder="Insira o Serial Number (SN / MAC) da ONT Huawei..."
                 value={inputSn}
                 onChange={(e) => setInputSn(e.target.value.toUpperCase())}
                 style={{ fontFamily: 'var(--font-mono)' }}
@@ -53,7 +53,7 @@ export const SearchHero: React.FC<SearchHeroProps> = ({
                 value={selectedOltId}
                 onChange={(e) => setSelectedOltId(e.target.value)}
               >
-                <option value="">Todas as OLTs (Busca Global)</option>
+                <option value="">Todas as OLTs Huawei</option>
                 {olts.map((olt) => (
                   <option key={olt.id} value={olt.id}>
                     {olt.name}
@@ -78,20 +78,13 @@ export const SearchHero: React.FC<SearchHeroProps> = ({
           </div>
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px', color: 'var(--color-text-secondary)', flexWrap: 'wrap' }}>
-            <span>Exemplos de SN:</span>
+            <span>Exemplo de Busca:</span>
             <button
               type="button"
               onClick={() => handleQuickSn('485754430296CBB7')}
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--color-border)', padding: '2px 8px', borderRadius: '4px', color: '#60a5fa', cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
             >
               485754430296CBB7 (Huawei)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickSn('FHTT87654321')}
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--color-border)', padding: '2px 8px', borderRadius: '4px', color: '#34d399', cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
-            >
-              FHTT87654321 (Fiberhome)
             </button>
           </div>
         </form>

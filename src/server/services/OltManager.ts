@@ -4,7 +4,7 @@ import { OLTConfig } from '../types.js';
 
 const CONFIG_FILE = path.join(process.cwd(), 'olts_config.json');
 
-const DEFAULT_SYSTEM_OLTS: OLTConfig[] = [
+const EXCLUSIVE_HUAWEI_OLTS: OLTConfig[] = [
   {
     id: 'olt-huawei-vila-embratel',
     name: 'OLT VILA EMBRATEL',
@@ -51,23 +51,9 @@ export class OltManager {
   }
 
   private loadOlts() {
-    try {
-      // Force loading DEFAULT_SYSTEM_OLTS to ensure these 3 real OLTs are always present and active
-      let customOlts: OLTConfig[] = [];
-      if (fs.existsSync(CONFIG_FILE)) {
-        const data = fs.readFileSync(CONFIG_FILE, 'utf-8');
-        const parsed = JSON.parse(data);
-        customOlts = parsed.filter((o: OLTConfig) => !o.isDefault);
-      }
-
-      // Combine fixed system OLTs + user added OLTs
-      this.olts = [...DEFAULT_SYSTEM_OLTS, ...customOlts];
-      this.saveOlts();
-    } catch (err) {
-      console.error('Erro ao carregar OLTs, redefinindo para padrão:', err);
-      this.olts = DEFAULT_SYSTEM_OLTS;
-      this.saveOlts();
-    }
+    // Exclusively set the 3 real Huawei OLTs as the sole active OLTs
+    this.olts = EXCLUSIVE_HUAWEI_OLTS;
+    this.saveOlts();
   }
 
   private saveOlts() {
@@ -90,6 +76,7 @@ export class OltManager {
     const newOlt: OLTConfig = {
       ...olt,
       id: `olt-${Date.now()}`,
+      vendor: 'HUAWEI',
       isDefault: false,
     };
     this.olts.push(newOlt);
@@ -108,9 +95,7 @@ export class OltManager {
 
   public deleteOlt(id: string): boolean {
     const target = this.getOltById(id);
-    // Prevent deletion of fixed system default OLTs
     if (target?.isDefault) {
-      console.warn(`Tentativa de excluir OLT padrão bloqueada (${target.name}).`);
       return false;
     }
 
