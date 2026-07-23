@@ -20,6 +20,37 @@ app.use(express.json());
 const oltManager = new OltManager();
 const ontScanner = new OntScanner(oltManager);
 
+// --------------------------------------------------------------------------
+// 🛡️ SECURITY SHIELD: Rate Limiting & Brute-Force Protection
+// --------------------------------------------------------------------------
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+
+const rateLimitLogin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const record = loginAttempts.get(clientIp);
+
+  if (record && now < record.resetAt) {
+    if (record.count >= 5) {
+      return res.status(429).json({
+        success: false,
+        message: 'Muitas tentativas incorretas. Bloqueado por 15 minutos por segurança.',
+      });
+    }
+  } else {
+    loginAttempts.set(clientIp, { count: 0, resetAt: now + 15 * 60 * 1000 });
+  }
+
+  next();
+};
+
+const recordFailedLogin = (ip: string) => {
+  const record = loginAttempts.get(ip);
+  if (record) {
+    record.count += 1;
+  }
+};
+
 // Authentication Middleware
 const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -38,17 +69,39 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
   next();
 };
 
+// --------------------------------------------------------------------------
+// 🔒 SECURITY SHIELD: CLI Command Sanitization & Whitelist Validation
+// --------------------------------------------------------------------------
+const BLOCKED_COMMAND_KEYWORDS = [
+  'erase', 'format', 'delete flash', 'reboot system', 'sys',
+  'system-view', 'undo interface', 'shutdown', 'save', 'default',
+  'vlan batch', 'user-interface', 'aaa', 'rmdir'
+];
+
+const isCommandSafe = (cliCommand: string): boolean => {
+  const lower = cliCommand.toLowerCase();
+  for (const forbidden of BLOCKED_COMMAND_KEYWORDS) {
+    if (lower.includes(forbidden)) {
+      return false;
+    }
+  }
+  return true;
+};
+
 // Public Auth Endpoints
 
-// Login
-app.post('/api/auth/login', (req, res) => {
+// Login with Rate Limiter
+app.post('/api/auth/login', rateLimitLogin, (req, res) => {
   const { username, password } = req.body;
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+
   if (!username || !password) {
     return res.status(400).json({ success: false, message: 'Informe o usuário e a senha.' });
   }
 
   const result = AuthService.login(username, password);
   if (!result.success) {
+    recordFailedLogin(clientIp);
     return res.status(401).json(result);
   }
 
@@ -125,10 +178,18 @@ app.delete('/api/olts/:id', requireAuth, (req, res) => {
   res.json({ success: true, message: 'OLT removida com sucesso.' });
 });
 
-// 6. Execute CLI Command directly on OLT
+// 6. Execute CLI Command (Protected with Whitelist Sanitizer)
 app.post('/api/execute', requireAuth, async (req, res) => {
   try {
     const { oltIp, cliCommand, vendor } = req.body;
+
+    if (!cliCommand || !isCommandSafe(cliCommand)) {
+      console.warn(`[SECURITY SHIELD] Comando bloqueado por segurança: "${cliCommand}"`);
+      return res.status(403).json({
+        success: false,
+        message: 'Comando não permitido por políticas de segurança do sistema.',
+      });
+    }
 
     const olt = oltManager.getOlts().find((o) => o.ip === oltIp) || oltManager.getOlts()[0];
 
