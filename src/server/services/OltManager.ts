@@ -35,8 +35,8 @@ const EXCLUSIVE_HUAWEI_OLTS: OLTConfig[] = [
     vendor: 'HUAWEI',
     ip: '172.18.1.46',
     port: 22,
-    username: 'root',
-    password: 'Provedor02717922Core!',
+    username: 'suporte',
+    password: 'Provedor02717922Core@',
     protocol: 'SSH',
     isMock: false,
     isDefault: true,
@@ -51,7 +51,6 @@ export class OltManager {
   }
 
   private loadOlts() {
-    // Exclusively set the 3 real Huawei OLTs as the sole active OLTs
     this.olts = EXCLUSIVE_HUAWEI_OLTS;
     this.saveOlts();
   }
