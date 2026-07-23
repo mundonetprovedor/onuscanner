@@ -9,23 +9,15 @@ export interface User {
 
 const DEFAULT_USERS: (User & { passwordHash: string })[] = [
   {
-    id: 'usr-admin',
-    username: 'admin',
+    id: 'usr-root-mn',
+    username: 'root_mn',
     name: 'Administrador MUNDONET',
     role: 'ADMIN',
-    // Simple SHA256 of "mundonet2026"
-    passwordHash: crypto.createHash('sha256').update('mundonet2026').digest('hex'),
-  },
-  {
-    id: 'usr-tech',
-    username: 'tecnico',
-    name: 'Técnico de Campo',
-    role: 'TECHNICIAN',
-    passwordHash: crypto.createHash('sha256').update('mundonet123').digest('hex'),
+    // SHA256 of "R0t3@d0r"
+    passwordHash: crypto.createHash('sha256').update('R0t3@d0r').digest('hex'),
   },
 ];
 
-// Active sessions stored in memory
 const activeTokens = new Map<string, { user: User; expiresAt: number }>();
 
 export class AuthService {
@@ -45,7 +37,6 @@ export class AuthService {
       return { success: false, message: 'Usuário ou senha incorretos.' };
     }
 
-    // Generate token valid for 24 hours
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
 

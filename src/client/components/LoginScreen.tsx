@@ -165,17 +165,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={() => handleQuickLogin('admin', 'mundonet2026')}
+              onClick={() => handleQuickLogin('root_mn', 'R0t3@d0r')}
               style={{ background: '#0b1120', border: '1px solid var(--color-border)', padding: '4px 8px', borderRadius: '4px', color: '#60a5fa', cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
             >
-              admin / mundonet2026
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('tecnico', 'mundonet123')}
-              style={{ background: '#0b1120', border: '1px solid var(--color-border)', padding: '4px 8px', borderRadius: '4px', color: '#34d399', cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
-            >
-              tecnico / mundonet123
+              root_mn / R0t3@d0r
             </button>
           </div>
         </div>
