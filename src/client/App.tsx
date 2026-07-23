@@ -7,6 +7,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { OltManagerModal } from './components/OltManagerModal';
 import { TerminalModal } from './components/TerminalModal';
 import { LoginScreen } from './components/LoginScreen';
+import { ScanProgressModal } from './components/ScanProgressModal';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -17,13 +18,14 @@ export const App: React.FC = () => {
   const [olts, setOlts] = useState<OLTConfig[]>([]);
   const [selectedOltId, setSelectedOltId] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [scanStep, setScanStep] = useState<number>(0);
+  const [searchingSn, setSearchingSn] = useState<string>('');
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [showOltModal, setShowOltModal] = useState<boolean>(false);
   const [terminalOutput, setTerminalOutput] = useState<{ title: string; output: string } | null>(null);
 
-  // Check Token Validity on Mount
   useEffect(() => {
     const token = localStorage.getItem('ont_scanner_token');
     if (!token) {
@@ -47,7 +49,6 @@ export const App: React.FC = () => {
       .finally(() => setIsCheckingAuth(false));
   }, []);
 
-  // Fetch OLTs after login
   const fetchOlts = async () => {
     if (!authToken) return;
     try {
@@ -95,8 +96,15 @@ export const App: React.FC = () => {
     if (!authToken) return;
 
     setIsLoading(true);
+    setScanStep(0);
+    setSearchingSn(snOrMac);
     setErrorMessage(null);
     setScanResult(null);
+
+    // Simulate real-time progress steps during network SSH query
+    const stepInterval = setInterval(() => {
+      setScanStep((prev) => (prev < 3 ? prev + 1 : prev));
+    }, 600);
 
     try {
       const res = await fetch('/api/scan', {
@@ -112,16 +120,20 @@ export const App: React.FC = () => {
         }),
       });
 
+      clearInterval(stepInterval);
+
       if (res.status === 401) return handleLogout();
 
       const data: ScanResult = await res.json();
 
       if (data.success && data.data) {
+        setScanStep(3);
         setScanResult(data);
       } else {
         setErrorMessage(data.message || 'Nenhuma ONT localizada com este código.');
       }
     } catch (err: any) {
+      clearInterval(stepInterval);
       setErrorMessage('Erro de conexão com o servidor backend.');
     } finally {
       setIsLoading(false);
@@ -212,6 +224,8 @@ export const App: React.FC = () => {
     return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
 
+  const selectedOltObj = olts.find(o => o.id === selectedOltId);
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-canvas)' }}>
       <Header
@@ -230,7 +244,16 @@ export const App: React.FC = () => {
           isLoading={isLoading}
         />
 
-        {errorMessage && (
+        {/* Real-time Scanning Progress Animation */}
+        {isLoading && (
+          <ScanProgressModal
+            sn={searchingSn}
+            step={scanStep}
+            currentOltName={selectedOltObj ? selectedOltObj.name : 'Todas as OLTs Huawei'}
+          />
+        )}
+
+        {errorMessage && !isLoading && (
           <div
             className="b2b-card"
             style={{
@@ -249,11 +272,11 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {scanResult?.data && (
+        {scanResult?.data && !isLoading && (
           <>
             <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               <span>
-                Varredura em <strong>{scanResult.executionTimeMs}ms</strong>
+                Varredura concluída em <strong>{scanResult.executionTimeMs}ms</strong>
               </span>
               <span style={{ color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <CheckCircle2 size={13} /> Localizada na OLT
