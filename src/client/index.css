@@ -1,6 +1,6 @@
 /* ==========================================================================
    MUNDONET ONT SCANNER - CORPORATE B2B DESIGN SYSTEM
-   Palette: Slate, Graphite, Corporate Blue (Navy), Neutral Accents
+   Compact Mobile & Single-Screen View
    ========================================================================== */
 
 :root {
@@ -31,41 +31,35 @@
   --color-text-secondary: #94a3b8; /* Slate 400 */
   --color-text-muted: #64748b;     /* Slate 500 */
 
-  /* Fonts - Clean typography without dotted zeros */
+  /* Fonts */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* Structure */
-  --radius-xl: 12px;
-  --radius-lg: 8px;
-  --radius-sm: 6px;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --radius-xl: 10px;
+  --radius-lg: 6px;
+  --radius-sm: 4px;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background-color: var(--color-canvas);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.4;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Animations */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .animate-spin {
@@ -73,15 +67,9 @@ body {
 }
 
 @keyframes pulse-shimmer {
-  0% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.6;
-  }
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
 
 .animate-pulse-shimmer {
@@ -91,40 +79,37 @@ body {
 /* Layout Container */
 .b2b-container {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 12px;
 }
 
-/* Clean Corporate Card */
+/* Clean Compact Card */
 .b2b-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
+  padding: 14px;
 }
 
 /* Form Controls */
 .b2b-input,
 .b2b-select {
   width: 100%;
-  height: 44px;
-  padding: 0 14px;
+  height: 38px;
+  padding: 0 10px;
   background-color: #0b1120;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 13px;
   font-family: var(--font-sans);
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .b2b-input:focus,
 .b2b-select:focus {
   border-color: var(--color-brand-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 /* Buttons */
@@ -132,11 +117,11 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 20px;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
   border-radius: var(--radius-lg);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   border: none;
@@ -149,18 +134,10 @@ body {
   color: #ffffff;
 }
 
-.b2b-btn-primary:hover {
-  background-color: var(--color-brand-hover);
-}
-
 .b2b-btn-secondary {
   background-color: rgba(255, 255, 255, 0.05);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
-}
-
-.b2b-btn-secondary:hover {
-  background-color: var(--color-surface-hover);
 }
 
 .b2b-btn-danger {
@@ -168,69 +145,21 @@ body {
   color: #ffffff;
 }
 
-.b2b-btn-danger:hover {
-  background-color: #b91c1c;
-}
-
 .b2b-btn-sm {
-  height: 36px;
-  padding: 0 14px;
-  font-size: 13px;
-  border-radius: var(--radius-sm);
-}
-
-/* Hero GPON Banner */
-.gpon-hero-banner {
-  background: linear-gradient(135deg, #0b1120 0%, #1e293b 100%);
-  border: 2px solid var(--color-brand-primary);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
-}
-
-.gpon-hero-title {
+  height: 30px;
+  padding: 0 10px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-.gpon-hero-code {
-  font-family: var(--font-sans);
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #60a5fa;
-  letter-spacing: -0.02em;
-}
-
-/* Featured Action Card */
-.featured-action-card {
-  background: rgba(220, 38, 38, 0.06);
-  border: 1px solid rgba(220, 38, 38, 0.3);
-  border-radius: var(--radius-xl);
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 20px;
+  border-radius: var(--radius-sm);
 }
 
 /* Badges */
 .b2b-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 4px;
+  padding: 2px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -249,30 +178,30 @@ body {
   background-color: #070b14;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: 12px 16px;
+  padding: 8px 12px;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12px;
   color: #34d399;
   white-space: pre-wrap;
   word-break: break-all;
 }
 
-/* Responsive Grid Adjustments */
-@media (max-width: 768px) {
+/* Mobile Responsive Optimizations */
+@media (max-width: 640px) {
+  .b2b-container {
+    padding: 0 8px;
+  }
+
   .b2b-card {
-    padding: 16px;
+    padding: 10px;
   }
 
-  .gpon-hero-code {
-    font-size: 1.6rem;
+  .mobile-compact-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
   }
 
-  .b2b-btn {
-    width: 100%;
-  }
-
-  .mobile-column {
-    flex-direction: column !important;
-    align-items: stretch !important;
+  .mobile-hide-subtext {
+    display: none !important;
   }
 }

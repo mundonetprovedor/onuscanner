@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
-import { OntDetails } from '../../server/types';
-import { Terminal, Copy, Check, Radio, User, ShieldCheck, Activity, AlertTriangle } from 'lucide-react';
+import { OntDetails, CommandTemplate } from '../../server/types';
+import { Copy, Check, User, Radio, Wifi, Terminal, Trash2, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface OntDetailsCardProps {
   details: OntDetails;
+  commands?: CommandTemplate[];
   onViewRawCli: () => void;
+  onExecuteCommand: (command: CommandTemplate) => void;
 }
 
-export const OntDetailsCard: React.FC<OntDetailsCardProps> = ({ details, onViewRawCli }) => {
+export const OntDetailsCard: React.FC<OntDetailsCardProps> = ({
+  details,
+  commands = [],
+  onViewRawCli,
+  onExecuteCommand,
+}) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [showMoreCommands, setShowMoreCommands] = useState<boolean>(false);
 
   const rx = details.opticalSignal.rxPower;
   const ponIdStr = `${details.frame}/${details.slot}/${details.port}`;
@@ -20,245 +28,149 @@ export const OntDetailsCard: React.FC<OntDetailsCardProps> = ({ details, onViewR
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 1500);
+    setTimeout(() => setCopiedKey(null), 1200);
   };
 
-  let signalBadge = { text: 'Sinal Ótimo', color: '#34d399', bg: 'var(--color-status-success-bg)' };
+  let signalBadge = { text: 'Ótimo', color: '#34d399' };
   if (rx < -28.0) {
-    signalBadge = { text: 'Atenuação Crítica', color: '#f87171', bg: 'var(--color-status-danger-bg)' };
+    signalBadge = { text: 'Crítico', color: '#f87171' };
   } else if (rx < -25.0) {
-    signalBadge = { text: 'Atenção (Sinal Baixo)', color: '#fbbf24', bg: 'var(--color-status-warning-bg)' };
+    signalBadge = { text: 'Atenção', color: '#fbbf24' };
   }
 
+  const deleteCmd = commands.find((c) => c.category === 'DELETE');
+  const rebootCmd = commands.find((c) => c.category === 'REBOOT');
+
   return (
-    <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
       
       {/* ===================================================================
-          1. DESTAQUE PRINCIPAL: ASSINANTE / CLIENTE (PRIMEIRA COISA A APARECER)
+          ULTRA-COMPACT SINGLE-SCREEN MOBILE DASHBOARD
           =================================================================== */}
-      <div className="b2b-card" style={{ backgroundColor: '#0b1120', border: '1px solid var(--color-brand-primary)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <User size={16} color="#60a5fa" />
-              <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-secondary)' }}>
-                CLIENTE / ASSINANTE
-              </span>
-              <span className={`b2b-badge ${details.status === 'ONLINE' ? 'b2b-badge-online' : 'b2b-badge-offline'}`}>
-                {details.status}
-              </span>
-            </div>
-
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-sans)', letterSpacing: '-0.01em' }}>
+      <div className="b2b-card" style={{ backgroundColor: '#0b1120', border: '1.5px solid var(--color-brand-primary)', padding: '12px' }}>
+        
+        {/* 1. Header Line: Subscriber & OLT */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', borderBottom: '1px solid var(--color-border)', paddingBottom: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+            <User size={14} color="#60a5fa" style={{ flexShrink: 0 }} />
+            <span style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {subscriberName}
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '6px', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-              <span>OLT: <strong style={{ color: '#60a5fa' }}>{details.oltName}</strong> ({details.oltIp})</span>
-              <span>•</span>
-              <span>SN: <strong style={{ fontFamily: 'var(--font-mono)', color: '#ffffff' }}>{details.sn}</strong></span>
-            </div>
+            </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+            <span className={`b2b-badge ${details.status === 'ONLINE' ? 'b2b-badge-online' : 'b2b-badge-offline'}`}>
+              {details.status}
+            </span>
             <button
-              className="b2b-btn b2b-btn-primary b2b-btn-sm"
+              className="b2b-btn b2b-btn-secondary b2b-btn-sm"
               onClick={() => handleCopy(subscriberName, 'sub')}
+              style={{ height: '24px', padding: '0 6px', fontSize: '10px' }}
             >
-              {copiedKey === 'sub' ? <Check size={14} color="#ffffff" /> : <Copy size={14} />}
-              <span>{copiedKey === 'sub' ? 'Copiado!' : 'Copiar Assinante'}</span>
+              {copiedKey === 'sub' ? <Check size={10} color="#34d399" /> : <Copy size={10} />}
+              <span>{copiedKey === 'sub' ? 'Copiado' : 'Copiar'}</span>
             </button>
           </div>
         </div>
-      </div>
 
-      {/* ===================================================================
-          2. ESTRUTURA DE BLOCOS GPON SEPARADOS (PON ID, ONU NÚMERO, VLAN)
-          =================================================================== */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
-        
-        {/* Box 1: Pon ID */}
-        <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '16px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
-            Pon ID (Chassi/Slot/PON)
-          </span>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, color: '#60a5fa', margin: '4px 0' }}>
-            {ponIdStr}
+        {/* 2. Compact 4-Box Telemetry Grid */}
+        <div className="mobile-compact-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '8px' }}>
+          
+          {/* Box 1: Pon ID */}
+          <div style={{ backgroundColor: '#1e293b', borderRadius: 'var(--radius-lg)', padding: '6px 8px', border: '1px solid var(--color-border)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+              <span>Pon ID</span>
+              <button onClick={() => handleCopy(ponIdStr, 'ponId')} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 0 }}>
+                {copiedKey === 'ponId' ? <Check size={10} color="#34d399" /> : <Copy size={10} />}
+              </button>
+            </div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#60a5fa', lineHeight: 1.2 }}>
+              {ponIdStr}
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-            <span>Frame {details.frame} / Slot {details.slot} / Port {details.port}</span>
+
+          {/* Box 2: ONU número */}
+          <div style={{ backgroundColor: '#1e293b', borderRadius: 'var(--radius-lg)', padding: '6px 8px', border: '1px solid var(--color-border)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+              <span>ONU ID</span>
+              <button onClick={() => handleCopy(onuNumberStr, 'onuId')} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 0 }}>
+                {copiedKey === 'onuId' ? <Check size={10} color="#34d399" /> : <Copy size={10} />}
+              </button>
+            </div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#34d399', lineHeight: 1.2 }}>
+              {onuNumberStr}
+            </div>
+          </div>
+
+          {/* Box 3: VLAN Uplink */}
+          <div style={{ backgroundColor: '#1e293b', borderRadius: 'var(--radius-lg)', padding: '6px 8px', border: '1px solid var(--color-border)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+              <span>VLAN</span>
+              <button onClick={() => handleCopy(primaryVlan, 'vlan')} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 0 }}>
+                {copiedKey === 'vlan' ? <Check size={10} color="#34d399" /> : <Copy size={10} />}
+              </button>
+            </div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#a78bfa', lineHeight: 1.2 }}>
+              {primaryVlan}
+            </div>
+          </div>
+
+          {/* Box 4: Sinal RX */}
+          <div style={{ backgroundColor: '#1e293b', borderRadius: 'var(--radius-lg)', padding: '6px 8px', border: '1px solid var(--color-border)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+              <span>Sinal Rx</span>
+              <span style={{ fontSize: '9px', color: signalBadge.color, fontWeight: 700 }}>{signalBadge.text}</span>
+            </div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: signalBadge.color, lineHeight: 1.2 }}>
+              {rx} <span style={{ fontSize: '10px', fontWeight: 400 }}>dBm</span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. Direct Management Action Bar (Desautorizar & Reboot No Topo) */}
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          {deleteCmd && (
             <button
-              className="b2b-btn b2b-btn-secondary b2b-btn-sm"
-              onClick={() => handleCopy(ponIdStr, 'ponId')}
-              style={{ padding: '2px 8px', height: '26px', fontSize: '11px' }}
+              className="b2b-btn b2b-btn-danger"
+              onClick={() => onExecuteCommand(deleteCmd)}
+              style={{ flex: 1.4, height: '32px', fontSize: '11px', padding: '0 8px' }}
             >
-              {copiedKey === 'ponId' ? <Check size={12} color="#34d399" /> : <Copy size={12} />}
-              <span>Copiar</span>
+              <Trash2 size={12} />
+              <span>Desautorizar ONU</span>
             </button>
-          </div>
-        </div>
+          )}
 
-        {/* Box 2: ONU número */}
-        <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '16px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
-            ONU número (ID da ONU)
-          </span>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, color: '#34d399', margin: '4px 0' }}>
-            {onuNumberStr}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-            <span>ID na Porta GPON</span>
+          {rebootCmd && (
             <button
-              className="b2b-btn b2b-btn-secondary b2b-btn-sm"
-              onClick={() => handleCopy(onuNumberStr, 'onuId')}
-              style={{ padding: '2px 8px', height: '26px', fontSize: '11px' }}
+              className="b2b-btn b2b-btn-primary"
+              onClick={() => onExecuteCommand(rebootCmd)}
+              style={{ flex: 1, height: '32px', fontSize: '11px', padding: '0 8px' }}
             >
-              {copiedKey === 'onuId' ? <Check size={12} color="#34d399" /> : <Copy size={12} />}
-              <span>Copiar</span>
+              <RefreshCw size={12} />
+              <span>Reboot</span>
             </button>
-          </div>
+          )}
+
+          <button
+            className="b2b-btn b2b-btn-secondary"
+            onClick={onViewRawCli}
+            style={{ height: '32px', padding: '0 8px', fontSize: '11px' }}
+            title="Log CLI Bruto"
+          >
+            <Terminal size={12} />
+            <span>Log CLI</span>
+          </button>
         </div>
 
-        {/* Box 3: VLAN Uplink */}
-        <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '16px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
-            VLAN Uplink / Serviço
-          </span>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, color: '#a78bfa', margin: '4px 0' }}>
-            {primaryVlan}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-            <span>Tráfego PPPoE / Dados</span>
-            <button
-              className="b2b-btn b2b-btn-secondary b2b-btn-sm"
-              onClick={() => handleCopy(primaryVlan, 'vlan')}
-              style={{ padding: '2px 8px', height: '26px', fontSize: '11px' }}
-            >
-              {copiedKey === 'vlan' ? <Check size={12} color="#34d399" /> : <Copy size={12} />}
-              <span>Copiar</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Box 4: Posição Completa */}
-        <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '16px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
-            Posição GPON Completa
-          </span>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.8rem', fontWeight: 800, color: '#f3f4f6', margin: '4px 0' }}>
-            {fullGponStr}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-            <span>String GPON Completa</span>
-            <button
-              className="b2b-btn b2b-btn-secondary b2b-btn-sm"
-              onClick={() => handleCopy(fullGponStr, 'fullGpon')}
-              style={{ padding: '2px 8px', height: '26px', fontSize: '11px' }}
-            >
-              {copiedKey === 'fullGpon' ? <Check size={12} color="#ffffff" /> : <Copy size={12} />}
-              <span>Copiar</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Grid: Telemetry & Hardware Details */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-        
-        {/* Optical Telemetry Card */}
-        <div className="b2b-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                TELEMETRIA DE SINAL ÓPTICO
-              </span>
-              <span className="b2b-badge" style={{ backgroundColor: signalBadge.bg, color: signalBadge.color }}>
-                {signalBadge.text}
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '12px' }}>
-              <span style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: signalBadge.color }}>
-                {rx}
-              </span>
-              <span style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>dBm</span>
-            </div>
-
-            <div style={{ height: '6px', background: '#0b1120', borderRadius: '4px', overflow: 'hidden', marginBottom: '16px' }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${Math.max(10, Math.min(100, ((rx - (-35)) / 20) * 100))}%`,
-                  backgroundColor: signalBadge.color,
-                  borderRadius: '4px',
-                }}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', paddingTop: '12px', borderTop: '1px solid var(--color-border)', fontSize: '13px' }}>
-            <div>
-              <span style={{ color: 'var(--color-text-muted)' }}>Sinal Tx ONT:</span>
-              <div style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{details.opticalSignal.txPower} dBm</div>
-            </div>
-            {details.opticalSignal.temperature && (
-              <div>
-                <span style={{ color: 'var(--color-text-muted)' }}>Temperatura:</span>
-                <div style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{details.opticalSignal.temperature} °C</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Hardware & OLT Info Card */}
-        <div className="b2b-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                ESPECIFICAÇÕES DO EQUIPAMENTO
-              </span>
-              <span className={`b2b-badge ${details.status === 'ONLINE' ? 'b2b-badge-online' : 'b2b-badge-offline'}`}>
-                {details.status}
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px' }}>
-              <div>
-                <span style={{ color: 'var(--color-text-muted)', fontSize: '12px' }}>Modelo da ONT:</span>
-                <div style={{ fontWeight: 600, color: '#f3f4f6', marginTop: '2px' }}>{details.model}</div>
-              </div>
-
-              <div>
-                <span style={{ color: 'var(--color-text-muted)', fontSize: '12px' }}>Distância:</span>
-                <div style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{details.distance} metros</div>
-              </div>
-
-              <div style={{ gridColumn: 'span 2' }}>
-                <span style={{ color: 'var(--color-text-muted)', fontSize: '12px' }}>Serial Number (SN):</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
-                  <span>{details.sn}</span>
-                  <button
-                    onClick={() => handleCopy(details.sn, 'sn')}
-                    style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', padding: 0 }}
-                    title="Copiar SN"
-                  >
-                    {copiedKey === 'sn' ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'flex-end' }}>
-            <button className="b2b-btn b2b-btn-secondary b2b-btn-sm" onClick={onViewRawCli}>
-              <Terminal size={14} />
-              <span>Ver Log CLI Bruto da OLT</span>
-            </button>
-          </div>
+        {/* Info Secondary Subtext */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '6px', paddingTop: '4px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <span>OLT: <strong style={{ color: '#60a5fa' }}>{details.oltName}</strong> ({details.oltIp})</span>
+          <span>SN: <strong style={{ color: '#ffffff' }}>{details.sn}</strong> | Dist: <strong>{details.distance}m</strong></span>
         </div>
 
       </div>
+
     </div>
   );
 };

@@ -10,42 +10,34 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ oltsCount, user, onOpenOltManager, onLogout }) => {
   return (
-    <header style={{ backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)', padding: '12px 0' }}>
-      <div className="b2b-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ backgroundColor: 'var(--color-brand-primary)', padding: '8px', borderRadius: 'var(--radius-lg)', color: '#ffffff', display: 'flex' }}>
-            <Activity size={18} />
+    <header style={{ backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)', padding: '8px 0' }}>
+      <div className="b2b-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ backgroundColor: 'var(--color-brand-primary)', padding: '6px', borderRadius: 'var(--radius-lg)', color: '#ffffff', display: 'flex' }}>
+            <Activity size={15} />
           </div>
           <div>
-            <h1 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)', letterSpacing: '-0.01em' }}>
+            <h1 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)', lineHeight: 1 }}>
               MUNDONET <span style={{ color: '#60a5fa', fontWeight: 400 }}>ONT SCANNER</span>
             </h1>
-            <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>Diagnóstico & Gerenciamento OLT (B2B Enterprise)</span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button className="b2b-btn b2b-btn-secondary b2b-btn-sm" onClick={onOpenOltManager}>
-            <Server size={14} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button className="b2b-btn b2b-btn-secondary b2b-btn-sm" onClick={onOpenOltManager} style={{ height: '28px', fontSize: '11px' }}>
+            <Server size={12} />
             <span>OLTs ({oltsCount})</span>
           </button>
 
           {user && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingLeft: '10px', borderLeft: '1px solid var(--color-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--color-text-primary)' }}>
-                <UserIcon size={14} color="#60a5fa" />
-                <span style={{ fontWeight: 600 }}>{user.name}</span>
-              </div>
-
-              <button
-                className="b2b-btn b2b-btn-secondary b2b-btn-sm"
-                onClick={onLogout}
-                title="Sair da Conta"
-                style={{ padding: '0 8px', color: '#f87171' }}
-              >
-                <LogOut size={14} />
-              </button>
-            </div>
+            <button
+              className="b2b-btn b2b-btn-secondary b2b-btn-sm"
+              onClick={onLogout}
+              title="Sair"
+              style={{ height: '28px', padding: '0 6px', color: '#f87171' }}
+            >
+              <LogOut size={12} />
+            </button>
           )}
         </div>
       </div>

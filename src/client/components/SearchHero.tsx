@@ -26,67 +26,41 @@ export const SearchHero: React.FC<SearchHeroProps> = ({
     }
   };
 
-  const handleQuickSn = (sn: string) => {
-    setInputSn(sn);
-    onSearch(sn);
-  };
-
   return (
-    <section style={{ marginTop: '24px' }}>
-      <div className="b2b-card">
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="mobile-column" style={{ display: 'flex', gap: '12px' }}>
-            <div style={{ flex: 1 }}>
-              <input
-                type="text"
-                className="b2b-input"
-                placeholder="Insira o Serial Number (SN / MAC) da ONT Huawei..."
-                value={inputSn}
-                onChange={(e) => setInputSn(e.target.value.toUpperCase())}
-                style={{ fontFamily: 'var(--font-mono)' }}
-              />
-            </div>
-
-            <div style={{ minWidth: '220px' }}>
-              <select
-                className="b2b-select"
-                value={selectedOltId}
-                onChange={(e) => setSelectedOltId(e.target.value)}
-              >
-                <option value="">Todas as OLTs Huawei</option>
-                {olts.map((olt) => (
-                  <option key={olt.id} value={olt.id}>
-                    {olt.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button type="submit" className="b2b-btn b2b-btn-primary" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Consultando OLT...</span>
-                </>
-              ) : (
-                <>
-                  <Search size={16} />
-                  <span>Localizar ONT</span>
-                </>
-              )}
-            </button>
+    <section style={{ marginTop: '10px' }}>
+      <div className="b2b-card" style={{ padding: '10px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            <input
+              type="text"
+              className="b2b-input"
+              placeholder="Cole o SN (HWTC...)"
+              value={inputSn}
+              onChange={(e) => setInputSn(e.target.value.toUpperCase())}
+              style={{ height: '34px', fontSize: '12px' }}
+            />
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px', color: 'var(--color-text-secondary)', flexWrap: 'wrap' }}>
-            <span>Exemplo de Busca:</span>
-            <button
-              type="button"
-              onClick={() => handleQuickSn('485754430296CBB7')}
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--color-border)', padding: '2px 8px', borderRadius: '4px', color: '#60a5fa', cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
+          <div style={{ width: '130px' }}>
+            <select
+              className="b2b-select"
+              value={selectedOltId}
+              onChange={(e) => setSelectedOltId(e.target.value)}
+              style={{ height: '34px', fontSize: '11px', padding: '0 4px' }}
             >
-              485754430296CBB7 (Huawei)
-            </button>
+              <option value="">Todas OLTs</option>
+              {olts.map((olt) => (
+                <option key={olt.id} value={olt.id}>
+                  {olt.name}
+                </option>
+              ))}
+            </select>
           </div>
+
+          <button type="submit" className="b2b-btn b2b-btn-primary" disabled={isLoading} style={{ height: '34px', padding: '0 12px', fontSize: '12px' }}>
+            {isLoading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+            <span>Buscar</span>
+          </button>
         </form>
       </div>
     </section>

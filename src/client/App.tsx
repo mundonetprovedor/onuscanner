@@ -224,7 +224,7 @@ export const App: React.FC = () => {
         onLogout={handleLogout}
       />
 
-      <main className="b2b-container" style={{ flex: 1, paddingBottom: '40px' }}>
+      <main className="b2b-container" style={{ flex: 1, paddingBottom: '20px' }}>
         <SearchHero
           olts={olts}
           selectedOltId={selectedOltId}
@@ -247,38 +247,32 @@ export const App: React.FC = () => {
             style={{
               borderColor: 'rgba(239, 68, 68, 0.3)',
               backgroundColor: 'rgba(239, 68, 68, 0.08)',
-              marginTop: '16px',
+              marginTop: '10px',
+              padding: '10px',
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
+              gap: '8px',
               color: '#f87171',
-              fontSize: '13px',
+              fontSize: '12px',
             }}
           >
-            <AlertCircle size={18} />
+            <AlertCircle size={16} />
             <span>{errorMessage}</span>
           </div>
         )}
 
         {scanResult?.data && !isLoading && (
           <>
-            <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-              <span>
-                Varredura concluída em <strong>{scanResult.executionTimeMs}ms</strong>
-              </span>
-              <span style={{ color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <CheckCircle2 size={13} /> Localizada na OLT
-              </span>
-            </div>
-
             <OntDetailsCard
               details={scanResult.data}
+              commands={scanResult.availableCommands}
               onViewRawCli={() =>
                 setTerminalOutput({
                   title: `Log CLI Bruto - ${scanResult.data?.sn}`,
                   output: scanResult.data?.rawCliOutput || 'Sem log disponível.',
                 })
               }
+              onExecuteCommand={handleExecuteCommand}
             />
 
             {scanResult.availableCommands && scanResult.availableCommands.length > 0 && (
@@ -292,8 +286,8 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      <footer style={{ borderTop: '1px solid var(--color-border)', padding: '16px 0', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '12px' }}>
-        MUNDONET Telecom • ONT Scanner Enterprise
+      <footer style={{ borderTop: '1px solid var(--color-border)', padding: '10px 0', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '11px' }}>
+        MUNDONET Telecom • Single-Screen Mobile Edition
       </footer>
 
       {showOltModal && (
